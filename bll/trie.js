@@ -3,16 +3,16 @@
 // Represent a node in the trie
 class Node {
 
-    constructor(key, parent=null, terminates=false, count=0) {
+    constructor(key, parent=null, terminates=false) {
         this.key = key;
         this.parent = parent;
         this.children = new Map();
 
-        // For memory optimisation I could remove 'terminates' and 'count' properties from the constructor (and add them in the insert() function only on terminating words)
-        // but for convenience I wanted that each node look the same in mather of properties.
+        // For memory optimisation I could remove 'terminates' and 'wordCount' properties from the constructor (and add them in the insertWord() function only on terminating words)
+        // but for convenience I wanted that each Node objects look the same.
 
-        this.terminates = false; // the char is the end of a word
-        this.count = count;
+        this.terminates = false; // True if the node is the last char in a word
+        this.wordCount = 0;
     }
 }
 
@@ -22,11 +22,10 @@ class Trie {
 
     constructor(){
         this.root = new Node('');
-
     }
 
     // Insert word into the trie
-    insert(word) {
+    insertWord(word) {
 
         if (!word) {
             throw "word can't be 'undefined', 'null' or 'empty string'";
@@ -48,14 +47,13 @@ class Trie {
         }
 
         node.terminates = true;
-
         // increment the word occurrence counter
-        node.count++
+        node.wordCount++
     }
 
 
-    // Search for a prefix or a whole key in the trie and return a node reference where the search ends
-    searchPrefix(word) {
+    // Find specific word in the trie and return a node reference that is the last char in the word
+    findWord(word) {
         if (!word) {
             throw "word can't be 'undefined', 'null' or 'empty string'";
         }
@@ -76,37 +74,29 @@ class Trie {
 
     }
 
-    // Get the number of time that word occurs
-    getWordOccurrence(word) {
-        const node = this.searchPrefix(word);
+    // Get the number of time that word occurs in the trie
+    getWordCount(word) {
+        const node = this.findWord(word);
         if (node != null && node.terminates) {
 
-            return node.count
+            return node.wordCount
         }
         return -1
     }
 
-    // Search if an exact word is in the trie. (if the word is terminating)
-    containsExactWord(word) {
-
-        const node = this.searchPrefix(word);
-        return node != null && node.terminates
-
-    }
-
 
     // Return an array with all whole words (terminating words) in the trie.
-    listAllWordsInTheTrie() {
+    getAllWordsCounts() {
 
         const result = [];
         const currWord = '';
-        this._listWords(this.root, currWord, result);
+        this._traverseTrie(this.root, currWord, result);
         return result
 
     }
 
     // pre-order traversal
-    _listWords(node, currWord, result) {
+    _traverseTrie(node, currWord, result) {
 
         if (!node) {
             return
@@ -114,9 +104,9 @@ class Trie {
 
         for (let [key, child] of node.children) {
             if (child.terminates) {
-                result.push({word: currWord + key, count: child.count});
+                result.push({word: currWord + key, count: child.wordCount});
             }
-            this._listWords(child, currWord + key, result)
+            this._traverseTrie(child, currWord + key, result)
         }
 
     }

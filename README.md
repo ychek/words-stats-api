@@ -12,6 +12,7 @@
 - With the Trie structure to store words, memory is not an issue when processing natural language input.
 especially in the case of natural language for which many words derive from each other) i.e: house-> housekeeper
 - Added a Unit test for the data structure part
+- Working with files that are up to tens of Gigabytes (remotely or locally)
 
 ### Assumptions
 
